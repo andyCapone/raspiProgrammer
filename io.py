@@ -1,6 +1,4 @@
-__author__ = 'andreas'
-
-
+#-*-coding:utf-8-*-
 from subprocess import call
 
 def createPath(path, **kwargs):
