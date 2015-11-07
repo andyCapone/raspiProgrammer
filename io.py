@@ -13,7 +13,7 @@ def createPath(path, **kwargs):
     # returns True on success or False otherwise.
 
     if not path.startswith("/"):
-        raise ValueError("Pfad ist nicht absolut. Bitte absoluten Pfad angeben.") #translate
+        raise ValueError("Pfad ist nicht absolut. Bitte absoluten Pfad angeben.\n{0}".format(path)) #translate
 
     ## get kwargs
     # get owner of directory to be created

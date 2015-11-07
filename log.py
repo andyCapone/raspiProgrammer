@@ -2,6 +2,9 @@
 from setup import Settings
 
 class Log:
+    LOG_FILE = "log.txt"
     def __init__(self):
-        if not Log.LOG:
-            return
+        settings = Settings()
+        print settings.logDir, settings.logSize, settings.log
+
+Log()

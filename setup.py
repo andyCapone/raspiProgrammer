@@ -1,65 +1,90 @@
 #-*-coding:utf-8-*-
-from os import path
+from os import path as osPath
 from io import createPath
+from helper import toBool, userInput
+
 
 class Settings:
+
+    # Class that contains program-settings.
+    # If a path != "" is given, settings will
+    # try to be loaded from that location.
+    # Otherwise, settings will try to be loaded from
+    # standard-path.
+    #
+    # Optionally takes a path as parameter.
+    #
+    # Raises IOError, if a path is set and cannot
+    # be created.
+
+    SETTINGS_FILE = "programmer.conf"
+
     def __init__(self, path = ""):
-        self.setPath(path)
-        self.log = True
-        self.logSize = 1024
+        if path == "":
+            self.setPath(osPath.dirname(osPath.realpath(__file__)))
+        else:
+            self.setPath(path)
+        if not self.load():
+            self.setStandard()
+
+    def setStandard(self):
+        self.log = False
+        self.logSize = 0
 
     def setPath(self, path):
         if path.endswith("/"):
             self.path = path
         else:
             self.path = path + "/"
-        self.logDir = path + "logs/"
+        self.logDir = self.path + "logs/"
         if not createPath(self.logDir):
             raise IOError("Log-Pfad konnte nicht erstellt werden.") #translate
-
+        self.settingsPath = self.path + Settings.SETTINGS_FILE
 
     def save(self):
         if self.path != "":
-            pass
+            f = open(self.settingsPath, "w")
+            f.write("log={0}".format(self.log))
+            f.write("\n")
+            f.write("logSize={0}".format(self.logSize))
+            f.close()
 
-def userInput(prompt, number = False):
-    if not number:
-        return raw_input(prompt + " ")
-    while True:
-        raw = raw_input(prompt + " ")
+    def load(self):
         try:
-            n = int(raw)
-        except ValueError:
-            print("Die Eingabe muss eine Zahl sein.") #translate
-            continue
-        except:
-            print("Unbekannter Fehler.") #tranlate
-            continue
+            f = open(self.settingsPath, "r")
+        except IOError:
+            return False
         else:
-            break
-    return n
+            contents = f.read()
+            f.close()
+            lines = [l for l in contents.split("\n") if (l != "")
+                     and (not l.startswith("#"))]
+            sDict = {}
+            for l in lines:
+                sDict[l.split("=")[0].strip()] = l.split("=",1)[-1].strip()
 
+            # set wether logging is enabled
+            self.log = toBool(sDict["log"])
+            # set logSize
+            self.logSize = int(sDict["logSize"])
 
+            return True
 
 def setup():
 
     # create Settings-instance
     settings = Settings()
-
-    # set main path as the path of the source-code
-    settings.setPath(path.dirname(path.realpath(__file__)))
-
     # log events?
     while True:
-        s = userInput("Soll geloggt werden? Y/n:") #translate
+        s = userInput("Soll geloggt werden? Y/n:", standard="y") #translate
         if s.lower() in ["n", "no"]:
             settings.log = False
             break
-        elif s.lower() in ["", "y", "yes"]:
+        elif s.lower() in ["y", "yes"]:
             settings.log = True
             # choose maximum log size in KiB
             while True:
-                n = userInput("Bitte die maximale Größe der Log-Datei in KiB eingeben (1024):", True) #translate
+                n = userInput("Bitte die maximale Größe der Log-Datei in KiB eingeben (1024):", True, standard=1024) #translate
                 if n > 0:
                     break
                 else:
@@ -73,5 +98,5 @@ def setup():
     return settings
 
 if __name__ == "__main__":
-    settings = setup()
-    print settings.path, settings.log, settings.logSize
+    s = setup()
+    s.save()
