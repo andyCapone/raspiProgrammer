@@ -90,33 +90,35 @@ def setup():
     for p in neededPackages:
         if not installedPackages.search(p):
             newPackages.append(p)
-    print("Folgende Pakete müssen installiert werden:") #translate
-    for p in newPackages:
-        print "- " + p
+    if newPackages:
+        print("Folgende Pakete müssen installiert werden:") #translate
+        for p in newPackages:
+            print "- " + p
 
-    while True:
-        s = userInput("Jetzt installieren? Y/n:", standard="y") #translate
-        if s.lower() in ["n", "no"]:
-            print("Installation abgebrochen, Setup wird beendet.") #translate
-            Log("Installation abgebrochen, Setup wird beendet. 1") #translate
-            exit(1)
-        elif s.lower() in ["y", "yes"]:
-            for p in newPackages:
-                err = call(["sudo", "apt-get", "-y", "install", p])
-                if err == 0:
-                    print(p + " erfolgreich installiert.") #translate
-                    Log(p + " erfolgreich installiert.") #translate
-                else:
-                    print(p + " konnte nicht installiert werden. Setup wird beendet.") #translate
-                    Log(p + " konnte nicht installiert werden. Exit-Code: {0}."
-                            " Setup wird beendet. 2") #translate
-                    exit(2)
-            break
-        else:
-            print("Eingabe nicht korrekt.") #translate
-            continue
+        while True:
+            s = userInput("Jetzt installieren? Y/n:", standard="y") #translate
+            if s.lower() in ["n", "no"]:
+                print("Installation abgebrochen, Setup wird beendet.") #translate
+                Log("Installation abgebrochen, Setup wird beendet. 1") #translate
+                exit(1)
+            elif s.lower() in ["y", "yes"]:
+                for p in newPackages:
+                    err = call(["sudo", "apt-get", "-y", "install", p])
+                    if err == 0:
+                        print(p + " erfolgreich installiert.") #translate
+                        Log(p + " erfolgreich installiert.") #translate
+                    else:
+                        print(p + " konnte nicht installiert werden. Setup wird beendet.") #translate
+                        Log(p + " konnte nicht installiert werden. Exit-Code: {0}."
+                                " Setup wird beendet. 2") #translate
+                        exit(2)
+                break
+            else:
+                print("Eingabe nicht korrekt.") #translate
+                continue
 
     # install avrdude
+    # !!! checken ob vorhanden !!!
     while True:
         s = userInput("avrdude von kcuzner muss von github geholt und installiert werden."
                       " Jetzt installieren? Y/n:", standard="y") #translate
@@ -126,7 +128,8 @@ def setup():
             exit(3)
         elif s.lower() in ["y", "yes"]:
             cwd = getcwd()
-            osPath.expanduser("/")
+            chdir(osPath.expanduser("/"))
+            Log("Installiere avrdude von kcuzner.") #translate
             err = call(["git", "clone", "https://github.com/kcuzner/avrdude"])
             if err == 0:
                 print("Download erfolgreich.") #translate
@@ -136,7 +139,7 @@ def setup():
                 Log("Download nicht erfolgreich. Exit-Code: {0}. "
                     "Setup wird abgebrochen. 4".format(err)) #translate
                 exit(4)
-            osPath.expanduser("/avrdude/avrdude/")
+            chdir(osPath.expanduser("/avrdude/avrdude/"))
             err = call("./bootstrap", shell=True)
             if err == 0:
                 print("bootstrap erfolgreich.") #translate
