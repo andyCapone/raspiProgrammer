@@ -1,5 +1,5 @@
 #-*-coding:utf-8-*-
-from setup import Settings
+from helper import Settings
 from traceback import format_exc
 from datetime import datetime
 from io import getFileSize
@@ -91,7 +91,6 @@ class Log:
                 return False
         else:
             return False
-
 
     def getLogSize(self):
         return getFileSize(self.settings.logDir + Log.LOG_FILE)

@@ -1,7 +1,6 @@
 #-*-coding:utf-8-*-
 from subprocess import call
-from os import path as ospath
-from traceback import format_exc
+from os import path as ospath, devnull
 
 def createPath(path, **kwargs):
 
@@ -31,23 +30,27 @@ def createPath(path, **kwargs):
         group = 0
 
     # list single directories
+    dNull = open(devnull, "wb")
     dirList = [d for d in path.split("/") if d != ""]
     for i in range(1, len(dirList) + 1):
         try:
             tmp = "/"
             for j in range(i):
                 tmp += dirList[j] + "/"
-            if call(["ls", tmp]) == 2:
+            if call(["ls", tmp], stderr=dNull, stdout=dNull) == 2:
                 # directory does not exist
-                if call(["mkdir", tmp]) != 0:
+                if call(["mkdir", tmp], stdout=dNull, stderr=dNull) != 0:
+                    dNull.close()
                     return False
                 # set owner and group, if given
                 if owner != 0:
-                    call(["chown", owner, tmp])
+                    call(["chown", owner, tmp], stderr=dNull, stdout=dNull)
                 if group != 0:
-                    call(["chown", ":"+group, tmp])
+                    call(["chown", ":"+group, tmp], stderr=dNull, stdout=dNull)
         except:
+            dNull.close()
             return False
+    dNull.close()
     return True
 
 def getFileSize(path):
