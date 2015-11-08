@@ -128,7 +128,7 @@ def setup():
             exit(3)
         elif s.lower() in ["y", "yes"]:
             cwd = getcwd()
-            chdir(osPath.expanduser("/"))
+            chdir(osPath.expanduser("~"))
             Log("Installiere avrdude von kcuzner.") #translate
             err = call(["git", "clone", "https://github.com/kcuzner/avrdude"])
             if err == 0:
@@ -139,7 +139,7 @@ def setup():
                 Log("Download nicht erfolgreich. Exit-Code: {0}. "
                     "Setup wird abgebrochen. 4".format(err)) #translate
                 exit(4)
-            chdir(osPath.expanduser("/avrdude/avrdude/"))
+            chdir(osPath.expanduser("~/avrdude/avrdude/"))
             err = call("./bootstrap", shell=True)
             if err == 0:
                 print("bootstrap erfolgreich.") #translate
