@@ -3,7 +3,7 @@ from helper import userInput, Settings
 from subprocess import Popen, PIPE, call
 from log import Log
 from sys import exit
-from os import chdir, getcwd
+from os import chdir, getcwd, path as osPath
 
 
 class InstalledPackages:
@@ -62,7 +62,7 @@ def setup():
             continue
     # to enable logging, settings will be saved now
     settings.save()
-    Log("Logging aktiviert, maximale Größe: {0} KiB".format(settings.logSize)) #translate
+    Log("Logging aktiviert, maximale Größe: {0} Byte".format(settings.logSize)) #translate
 
     # perform update?
     while True:
@@ -95,7 +95,7 @@ def setup():
         print "- " + p
 
     while True:
-        s = userInput("Jetzt installieren? Y/n:") #translate
+        s = userInput("Jetzt installieren? Y/n:", standard="y") #translate
         if s.lower() in ["n", "no"]:
             print("Installation abgebrochen, Setup wird beendet.") #translate
             Log("Installation abgebrochen, Setup wird beendet. 1") #translate
@@ -126,7 +126,7 @@ def setup():
             exit(3)
         elif s.lower() in ["y", "yes"]:
             cwd = getcwd()
-            chdir("~/")
+            osPath.expanduser("/")
             err = call(["git", "clone", "https://github.com/kcuzner/avrdude"])
             if err == 0:
                 print("Download erfolgreich.") #translate
@@ -136,7 +136,7 @@ def setup():
                 Log("Download nicht erfolgreich. Exit-Code: {0}. "
                     "Setup wird abgebrochen. 4".format(err)) #translate
                 exit(4)
-            chdir("~/avrdude/avrdude/")
+            osPath.expanduser("/avrdude/avrdude/")
             err = call("./bootstrap", shell=True)
             if err == 0:
                 print("bootstrap erfolgreich.") #translate
@@ -173,6 +173,7 @@ def setup():
                 Log("make install nicht erfolgreich. Exit-Code: {0}. "
                     "Setup wird abgebrochen. 8".format(err)) #translate
                 exit(8)
+            chdir(cwd)
             break
         else:
             print("Eingabe nicht korrekt.") #translate
