@@ -14,8 +14,8 @@ class Settings:
     #
     # Optionally takes a path as parameter.
     #
-    # Raises IOError, if a path is set and cannot
-    # be created.
+    # Raises IOError, if log-path cannot be
+    # created.
 
     SETTINGS_FILE = "programmer.conf"
 
@@ -29,7 +29,7 @@ class Settings:
 
     def setStandard(self):
         self.log = False
-        self.logSize = 0
+        self.logSize = 1024**2
 
     def setPath(self, path):
         if path.endswith("/"):
@@ -64,9 +64,15 @@ class Settings:
                 sDict[l.split("=")[0].strip()] = l.split("=",1)[-1].strip()
 
             # set wether logging is enabled
-            self.log = toBool(sDict["log"])
+            if "log" in sDict.keys():
+                self.log = toBool(sDict["log"])
+            else:
+                self.log = False
             # set logSize
-            self.logSize = int(sDict["logSize"])
+            if "logSize" in sDict.keys():
+                self.logSize = int(sDict["logSize"])
+            else:
+                self.logSize = 1024**2
 
             return True
 
@@ -90,7 +96,7 @@ def setup():
                 else:
                     print("Zahl zu klein.") #translate
                     continue
-            settings.logSize = n
+            settings.logSize = n*1024
             break
         else:
             print("Eingabe nicht korrekt.") #translate

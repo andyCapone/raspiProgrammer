@@ -1,5 +1,7 @@
 #-*-coding:utf-8-*-
 from subprocess import call
+from os import path as ospath
+from traceback import format_exc
 
 def createPath(path, **kwargs):
 
@@ -47,3 +49,13 @@ def createPath(path, **kwargs):
         except:
             return False
     return True
+
+def getFileSize(path):
+
+    # returns size of file or directory.
+    # returns 0 if error occurs.
+
+    try:
+        return ospath.getsize(path)
+    except:
+        return 0
